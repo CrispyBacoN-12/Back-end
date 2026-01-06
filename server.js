@@ -60,7 +60,12 @@ app.post("/api/auth/google", async (req, res) => {
     }
 
     const token = jwt.sign({ email, sub: payload.sub }, JWT_SECRET, { expiresIn: "7d" });
-
+await supabase
+  .from("profiles")
+  .upsert(
+    { email },               // ใส่ fields ขั้นต่ำก่อน
+    { onConflict: "email" }
+  );
     return res.json({ token, email });
   } catch (err) {
     console.error("Auth error:", err);
@@ -73,3 +78,4 @@ const PORT = process.env.PORT || 3000;
 app.listen(PORT, "0.0.0.0", () => {
   console.log(`Server running on port ${PORT}`);
 });
+
